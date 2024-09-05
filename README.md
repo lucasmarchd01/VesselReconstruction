@@ -19,6 +19,8 @@ class, with a f1 score of 0.96. The object class, however, has much less consist
 performance, with a f1 score of 0.05. Qualitatively, the unet performs adequately but
 more work needs to be done to improve the performance of the network on the object
 class.
+![Screenshot 2024-09-05 at 11 28 49 AM](https://github.com/user-attachments/assets/cd3e5d7f-bc10-46ba-ada2-cb7a3d5f2b2d)
+![Screenshot 2024-09-05 at 11 29 02 AM](https://github.com/user-attachments/assets/80f7ac14-0bfe-43a8-8a7b-0063b2f4a68d)
 
 ```
 Evaluation Metrics: [0.9427585005760193, 0.931469202041626]
@@ -42,15 +44,20 @@ For threshold segmentation, the first method that was used
 for choosing the threshold was by calculating the mean pixel value of all images in the
 dataset along with the standard deviation. The lower threshold was selected as mean –
 std and the upper threshold was the mean + std.
+![Screenshot 2024-09-05 at 11 29 08 AM](https://github.com/user-attachments/assets/30515717-0c6d-4447-af8d-34c0fa666089)
+
 The images above show an example of a ground truth segmentation with the predicted
 segmentation from the thresholding method. Evidently, the thresholding was not able to
 localize the vessel without predicted most of the entire background as the object class.
 As such, we tried manually changing the threshold value to reflect the characteristics of
 the image. The vessel part of the image is relatively dark compared to the rest of the
 image, so a lower threshold value of 0 and upper threshold value of 2 was selected.
+![Screenshot 2024-09-05 at 11 29 13 AM](https://github.com/user-attachments/assets/14cd5aad-63e6-4efa-adc3-dfa13a9e08ec)
+
 This method of threshold selected performed much better than using the mean pixel
 value and was selected for generating the rest of the segmentation data for volume
 reconstruction.
+
 ### Region Growing: 
 For the region growing algorithm, the seed selection was based on
 the characteristics of the image. Since the object class has relatively lower pixel value
@@ -61,6 +68,8 @@ this, the border region of the image is not looked at for the region growing and
 selection algorithms. The maximum difference parameter was selected to reflect the
 range of values found in the vessel, which was a pixel intensity of roughly around 0 to 7.
 A maximum difference of 7 was selected.
+![Screenshot 2024-09-05 at 11 29 18 AM](https://github.com/user-attachments/assets/5a6d59fc-5d14-4579-a89a-03b2048cb389)
+
 The images above show example ground truth segmentations with the predictions from
 the region growing algorithm. From these images we can see that the region growing
 algorithm was able to select seeds that describe both the background and object class.
@@ -75,6 +84,8 @@ U-Net can be seen in question 1.
 ## Region Growing Algorithm and Image Characteristics
 
 ### Thresholding:
+![Screenshot 2024-09-05 at 11 29 25 AM](https://github.com/user-attachments/assets/3560301a-6d0d-465d-9520-3a93ae8f3cdd)
+
 The above image is the ground truth segmentation volume (blue) superimposed with the
 thresholding segmentation method (brown). The thresholding approach was able to
 segment the same regions as the ground truth, however, the thresholding approach
@@ -90,6 +101,8 @@ leading to uncertainty in the segmentation. This can result in a larger segmente
 volume than the ground truth if the threshold is set too high, or if the boundary is
 estimated incorrectly.
 ### Region Growing:
+![Screenshot 2024-09-05 at 11 29 32 AM](https://github.com/user-attachments/assets/e714977a-d44a-4eaf-bef4-82281f5ade92)
+
 The above image is the ground truth segmentation volume (blue) superimposed with the
 region growing segmentation method (green). Here we can see that the thresholding
 algorithm did a better job as localizing the vessel compared to the thresholding
@@ -107,6 +120,8 @@ growing algorithm, such as the threshold for similarity between pixels, can also
 the final segmentation result. If the parameters are not properly tuned or are too lenient,
 the algorithm may include more pixels in the segmentation, leading to a larger volume.
 ### U-Net:
+![Screenshot 2024-09-05 at 11 29 38 AM](https://github.com/user-attachments/assets/42488122-7bec-4ca7-9a2d-0ebc5c4b1e6d)
+
 The above image is the ground truth segmentation volume (blue) superimposed with the
 U-Net segmentation method (red). We can see that the unet volume prediction matches
 the ground truth segmentation it terms of shape and volume much more than the
@@ -160,6 +175,8 @@ coded the length of the border into the seed selection algorithm and the region 
 algorithm so that they would ignore and not grow into these regions. An example image
 segmentation from the original algorithm (left) and the revised version (right) can be
 seen below.
+![Screenshot 2024-09-05 at 11 29 44 AM](https://github.com/user-attachments/assets/545f649e-9402-43fa-bcde-3fc4506a1d48)
+
 We can see that the region growing algorithm was able to successfully ignore the
 borders of the image, segmenting the region of interest more precisely.
 For improving the U-net model, we would like to investigate ways to improve the training
@@ -167,6 +184,8 @@ curves to potentially improve outcomes. As such, we train the model and lower th
 learning rate by a factor of 10, since the first model was not able to converge the
 validation accuracy and loss. Below are the updated training curves, along with the new
 reconstructed volume for the U-Net segmentation.
+![Screenshot 2024-09-05 at 11 29 50 AM](https://github.com/user-attachments/assets/c74de7a7-9ae2-4928-9efe-700bc8861147)
+
 ```
 Evaluation Metrics: [0.6100397706031799, 0.9206153154373169]
 Model Hyperparameters:
@@ -182,6 +201,8 @@ precision recall f1-score support
 1 0.25 0.16 0.19 426227
 accuracy 0.92 7110656
 ```
+![Screenshot 2024-09-05 at 11 29 56 AM](https://github.com/user-attachments/assets/e29abd46-f443-438e-a2c4-fe6be0d0b061)
+
 From these results, we can see that the U-Net has training curves that follow a natural
 convergence to a low loss and high accuracy. Additionally, the metrics for both precision
 and recall are improved with the new U-Net. By looking at the volume, the U-Net
